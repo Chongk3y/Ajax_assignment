@@ -214,7 +214,74 @@ $(document).ready(function(){
                     table.search(this.value).draw()
                 });
 
+                $('#add-account').on('click', function(e){
+                    e.preventDefault()
+                    addAccount()
+                })
+
             }
         })
     }
+    function addAccount(){
+        $.ajax({
+            type: 'GET',
+            url: '../accounts/add-account.html',
+            dataType: 'html',
+            success: function(view){
+                $('.modal-container').html(view)
+                $('#staticBackdrop').modal('show')
+
+                $('#form-add-account').on('submit', function(e){
+                    e.preventDefault()
+                    saveAccount()
+                })
+            }
+        })
+    }
+
+    function saveAccount(){
+        $.ajax({
+            type: 'POST',
+            url: '../accounts/add-account.php',  // Make sure this points to your PHP handler
+            data: $('form').serialize(),         // Serialize the form data
+            dataType: 'json',                    // Expect a JSON response
+            success: function(response) {
+                if (response.status === 'error') {
+                    // Display validation errors for each field
+                    if (response.first_nameErr) {
+                        $('#first_name').addClass('is-invalid');
+                        $('#first_name').next('.invalid-feedback').text(response.first_nameErr).show();
+                    }else{
+                        $('#first_name').removeClass('is-invalid');
+                    }
+                    if (response.last_nameErr) {
+                        $('#last_name').addClass('is-invalid');
+                        $('#last_name').next('.invalid-feedback').text(response.last_nameErr).show();
+                    }else{
+                        $('#last_name').removeClass('is-invalid');
+                    }
+                    if (response.usernameErr) {
+                        $('#username').addClass('is-invalid');
+                        $('#username').next('.invalid-feedback').text(response.usernameErr).show();
+                    }else{
+                        $('#username').removeClass('is-invalid');
+                    }
+                    if (response.passwordErr) {
+                        $('#password').addClass('is-invalid');
+                        $('#password').next('.invalid-feedback').text(response.passwordErr).show();
+                    }else{
+                        $('#password').removeClass('is-invalid');
+                    }
+                } else if (response.status === 'success') {
+                    // Hide the modal and reset the form on success
+                    $('#staticBackdrop').modal('hide');
+                    $('form')[0].reset();  // Reset the form
+                    // Optionally, redirect to the product listing page or display a success message
+                    viewAccounts()
+                }
+            }
+        });
+        
+    }
+    
 });

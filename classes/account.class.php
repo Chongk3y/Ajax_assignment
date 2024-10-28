@@ -35,6 +35,14 @@ class Account{
         return $query->execute();
     }
 
+    function getAll(){
+        $sql = "SELECT * FROM account;";
+        $query = $this->db->connect()->prepare($sql);
+        $query->execute();
+    
+        return $query->fetchAll();
+    }
+    
     function usernameExist($username, $excludeID){
         $sql = "SELECT COUNT(*) FROM account WHERE username = :username";
         if ($excludeID){

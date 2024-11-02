@@ -18,7 +18,7 @@ $(document).ready(function(){
         viewProducts()
     })
 
-    $('#accounts-link').on('click', function(e){
+    $('#accounts-link').on('click', function(e) {
         e.preventDefault()
         viewAccounts()
     })
@@ -28,7 +28,7 @@ $(document).ready(function(){
         $('#dashboard-link').trigger('click')
     }else if (url.endsWith('products')){
         $('#products-link').trigger('click')
-    }else if (url.endsWith('accounts')){
+    }else if (url.endsWith('accounts')) {
         $('#accounts-link').trigger('click')
     }else{
         $('#dashboard-link').trigger('click')
@@ -129,14 +129,16 @@ $(document).ready(function(){
     }
 
     function saveProduct(){
+        let form = new FormData($('#form-add-product')[0])
         $.ajax({
             type: 'POST',
-            url: '../products/add-product.php',  // Make sure this points to your PHP handler
-            data: $('form').serialize(),         // Serialize the form data
-            dataType: 'json',                    // Expect a JSON response
+            url: '../products/add-product.php',
+            data: form,
+            dataType: 'json',
+            processData: false,
+            contentType: false,
             success: function(response) {
                 if (response.status === 'error') {
-                    // Display validation errors for each field
                     if (response.codeErr) {
                         $('#code').addClass('is-invalid');
                         $('#code').next('.invalid-feedback').text(response.codeErr).show();
@@ -161,16 +163,19 @@ $(document).ready(function(){
                     }else{
                         $('#price').removeClass('is-invalid');
                     }
+                    if (response.imageErr) {
+                        $('#product_image').addClass('is-invalid');
+                        $('#product_image').next('.invalid-feedback').text(response.imageErr).show();
+                    }else{
+                        $('#product_image').removeClass('is-invalid');
+                    }
                 } else if (response.status === 'success') {
-                    // Hide the modal and reset the form on success
-                    $('#staticBackdrop').modal('hide');
-                    $('form')[0].reset();  // Reset the form
-                    // Optionally, redirect to the product listing page or display a success message
+                    $('#modal-add-product').modal('hide');
+                    $('#form-add-product')[0].reset();
                     viewProducts()
                 }
             }
         });
-        
     }
 
     function fetchCategories(){
@@ -195,34 +200,7 @@ $(document).ready(function(){
         });
     }
     
-    function viewAccounts(){
-        $.ajax({
-            type: 'GET',
-            url: '../accounts/view-accounts.php',
-            dataType: 'html',
-            success: function(response){
-                $('.content-page').html(response)
-
-                var table = $('#table-accounts').DataTable({
-                    dom: 'rtp',
-                    pageLength: 10,
-                    ordering: false,
-                });
-
-                // Bind custom input to DataTable search
-                $('#custom-search').on('keyup', function() {
-                    table.search(this.value).draw()
-                });
-
-                $('#add-account').on('click', function(e){
-                    e.preventDefault()
-                    addAccount()
-                })
-
-            }
-        })
-    }
-    function addAccount(){
+    function addAccount() {
         $.ajax({
             type: 'GET',
             url: '../accounts/add-account.html',
@@ -239,26 +217,50 @@ $(document).ready(function(){
         })
     }
 
-    function saveAccount(){
+    function viewAccounts() {
+        $.ajax({
+            url: '../accounts/view-accounts.php',
+            dataType: 'html',
+            success: function(response){
+                $('.content-page').html(response)
+
+                var table = $('#table-products').DataTable({
+                    dom: 'rtp',
+                    pageLength: 10,
+                    ordering: false,
+                });
+
+                // Bind custom input to DataTable search
+
+                $('#add-account').on('click', function(e){
+                    e.preventDefault()
+                    addAccount()
+                })
+
+            }
+        })
+    }
+
+    function saveAccount() {
         $.ajax({
             type: 'POST',
             url: '../accounts/add-account.php',  // Make sure this points to your PHP handler
-            data: $('form').serialize(),         // Serialize the form data
+            data: $('#form-add-account').serialize(),         // Serialize the form data
             dataType: 'json',                    // Expect a JSON response
             success: function(response) {
                 if (response.status === 'error') {
                     // Display validation errors for each field
-                    if (response.first_nameErr) {
-                        $('#first_name').addClass('is-invalid');
-                        $('#first_name').next('.invalid-feedback').text(response.first_nameErr).show();
+                    if (response.firstNameErr) {
+                        $('#first-name').addClass('is-invalid');
+                        $('#first-name').next('.invalid-feedback').text(response.firstNameErr).show();
                     }else{
-                        $('#first_name').removeClass('is-invalid');
+                        $('#first-name').removeClass('is-invalid');
                     }
-                    if (response.last_nameErr) {
-                        $('#last_name').addClass('is-invalid');
-                        $('#last_name').next('.invalid-feedback').text(response.last_nameErr).show();
+                    if (response.lastNameErr) {
+                        $('#last-name').addClass('is-invalid');
+                        $('#last-name').next('.invalid-feedback').text(response.lastNameErr).show();
                     }else{
-                        $('#last_name').removeClass('is-invalid');
+                        $('#last-name').removeClass('is-invalid');
                     }
                     if (response.usernameErr) {
                         $('#username').addClass('is-invalid');
@@ -272,16 +274,20 @@ $(document).ready(function(){
                     }else{
                         $('#password').removeClass('is-invalid');
                     }
+                    if (response.roleErr) {
+                        $('#role').addClass('is-invalid');
+                        $('#role').next('.invalid-feedback').text(response.roleErr).show();
+                    }else{
+                        $('#role').removeClass('is-invalid');
+                    }
                 } else if (response.status === 'success') {
                     // Hide the modal and reset the form on success
                     $('#staticBackdrop').modal('hide');
-                    $('form')[0].reset();  // Reset the form
+                    $('#form-add-account')[0].reset();  // Reset the form
                     // Optionally, redirect to the product listing page or display a success message
                     viewAccounts()
                 }
             }
         });
-        
     }
-    
 });

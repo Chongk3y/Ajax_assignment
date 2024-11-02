@@ -52,6 +52,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $imageErr = 'File size must not exceed 5MB.';
     }
 
+    $imageFileType = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+    if(empty($image)){
+        $imageErr = 'Product image is required.';
+    }else if(!in_array($imageFileType, $allowedType)){
+        $imageErr = 'Accepted files are jpg, jpeg, and png only.';
+    }
+
     // If there are validation errors, return them as JSON
     if(!empty($codeErr) || !empty($nameErr) || !empty($categoryErr) || !empty($priceErr) || !empty($imageErr)){
         echo json_encode([

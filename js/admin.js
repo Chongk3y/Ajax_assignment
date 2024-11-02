@@ -67,7 +67,7 @@ $(document).ready(function(){
                 beginAtZero: true,
                 max: 10000,
                 ticks: {
-                    stepSize: 2000  // Set step size to 2000
+                    stepSize: 2000
                 }
             }
             }
@@ -89,7 +89,6 @@ $(document).ready(function(){
                     ordering: false,
                 });
 
-                // Bind custom input to DataTable search
                 $('#custom-search').on('keyup', function() {
                     table.search(this.value).draw()
                 });
@@ -116,7 +115,7 @@ $(document).ready(function(){
             dataType: 'html',
             success: function(view){
                 $('.modal-container').html(view)
-                $('#staticBackdrop').modal('show')
+                $('#modal-add-product').modal('show')
 
                 fetchCategories()
 
